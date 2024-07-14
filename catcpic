@@ -1,0 +1,369 @@
+#!/usr/bin/perl -s
+
+# Multi-mode Canon Cat eDSK autostart patcher
+#
+# Usage: ./catcpic [-cold] [-idtable=XXX] input_edsk input_image_pbm [four_digit_hex_token]
+# The patched disk image is emitted to standard output.
+#
+# input_edsk: Cat eDSK image (check with optedsk to ensure validity)
+# input_image_pbm: 28896-byte inverted 672x344 PBM image for preview tracks
+# optional:
+# -idtable=XXX: use the 256-byte hex string as the idtable (otherwise
+# a random one is generated)
+# four_digit_hex_token: run this token after loading, return to editor after
+# if not present: print "press any key", beep and wait, then enter editor
+# if present and -cold also specified: run this token after loading,
+# and reset the machine after
+#
+# Copyright (C)2024 Cameron Kaiser. All rights reserved.
+# BSD license.
+# http://oldvcr.blogspot.com/
+
+eval "use bytes";
+
+$idtable ||= '';
+$cold ||= 0; # by default do not make a cold booter
+$new_a7 ||= 4223264; # 0x4070e0 + 64 bytes
+$target ||= $new_a7 + 4;
+
+$eos = 4223200;
+
+die("new a7 value must be at least 0x4070e0 for this method\n")
+	if ($new_a7 < 4223200);
+
+($input, $image, $token) = (@ARGV);
+die("usage: $0 [-cold] input_edsk input_image_pbm [four_digit_hex_token]\n")
+	if (!length($input) || !length($image));
+die("cold booters require a token to start from\n")
+	if ($cold && !length($token));
+if (length($token)) {
+	$token = lc($token);
+	die("nonsense hex token\n") if ($token =~ /[^0-9a-f]/);
+}
+undef $/;
+open(K, "$input") || die("can't read $input: $!\n");
+$disk = <K>;
+close(K);
+open(K, "$image") || die("can't read $image: $!\n");
+$img = <K>;
+close(K);
+
+if ($cold) {
+	warn "patching as cold booter\n";
+} elsif (length($token)) {
+	warn "patching as bootable editor-compatible\n";
+} else {
+	warn "patching as picture document disk\n";
+}
+
+die("$input is not an Extended CPC DSK File\n")
+	if (substr($disk, 0, 21) ne "EXTENDED CPC DSK File");
+
+# find track zero and use as our basis. if this was a previously formatted
+# disk, it's entirely possible there are multiple track zeroes (a bad drive
+# may put it wherever) and it's usually the last of them. we will use this as
+# our anchor since the tracks are laid out in order after that.
+$tzero = 0;
+for($i=256;$i<length($disk);$i+=256) {
+	if (substr($disk, $i, 10) eq 'Track-Info') {
+		$tn = unpack("C", substr($disk, $i + 24, 1));
+		next if ($tn);
+		warn "candidate track zero at offset $i\n";
+		$tzero = $i;
+	}
+}
+die("could not find any track zero\n") if (!$tzero);
+$tzero -= 256;
+
+die("$input does not have the correct geometry to be Cat compatible\n")
+	if (0 ||
+		substr($disk, $tzero + 16384, 10) ne "Track-Info" ||
+		substr($disk, $tzero + 21760, 10) ne "Track-Info" ||
+		substr($disk, $tzero + 27136, 10) ne "Track-Info" ||
+		substr($disk, $tzero + 32512, 10) ne "Track-Info" ||
+		substr($disk, $tzero + 37888, 10) ne "Track-Info" ||
+		substr($disk, $tzero + 43264, 10) ne "Track-Info" ||
+	0);
+die("$image is not a 672x344 PBM\n")
+	if (substr($img, 0, 11) ne "P4\n672 344\n");
+$img = substr($img, 11);
+die("$image does not contain 28896/\$70e0 bytes of bitmap data\n")
+	if (length($img) < 28896);
+
+# get a new idtable, unless we specified one
+if (!length($idtable)) {
+	if (open(K, "/dev/urandom")) {
+		read(K, $idtable, 128);
+		close(K);
+	} elsif (open(K, "/dev/random")) {
+		read(K, $idtable, 128);
+		close(K);
+	} else {
+		warn "can't open /dev/u?random, idtable unmodified\n";
+	}
+} else {
+	$idtable = pack("H*", $idtable);
+}
+die("idtable value is not 128 bytes\n") if (length($idtable) &&
+	length($idtable) != 128);
+
+# phase 1: patch system ID area to branch to our code
+# this is repeated for all 10 sectors in track 0, so patch them all
+# they should all match
+# this is repeated again for ONE sector in the second track and
+# the eighth track
+die("$input has defective initial tracks\n")
+	if (0 ||
+		substr($disk, $tzero +  256, 10) ne "Track-Info" ||
+		substr($disk, $tzero + 5632, 10) ne "Track-Info" ||
+	0);
+# patch the stack pointer to hit our new routine
+$a7 = -1;
+for($i=1;$i<11;$i++) {
+	# patch a7
+	$offs = $tzero + 512*$i + 28; # point to A7 in each copy of the idblock
+	$na7 = unpack("N", substr($disk, $offs, 4));
+	die("unexpected value for a7 at sector+1 $i: $na7\n")
+		if ($na7 < $eos || $na7 > 16777215);
+	if ($a7 == -1) {
+		$a7 = $na7;
+	} else {
+		die("a7 values didn't match at sector+1 $i: $a7 $na7\n")
+			if ($a7 != $na7);
+	}
+	warn "patched stored A7 at offset $offs\n";
+	substr($disk, $offs, 4) = pack("N", $new_a7);
+
+	if (length($idtable)) {
+		$offs += 228;
+		warn "patched idtable entry at offset $offs\n";
+		substr($disk, $offs, 128) = $idtable;
+	}
+}
+
+# now patch the single sectors in the second (s0) and eighth (s9) track
+# these may or may not be present
+foreach $toffs ([$tzero + 5632,0],[$tzero + 43264,9]) {
+	$offs = $toffs->[0] + 26;
+	$dsec = $toffs->[1];
+
+	# walk the track indexes 
+	$found = -1;
+	TWALK: foreach $ss (0..10) {
+		$cs = unpack("C", substr($disk, $offs, 1));
+		die("unexpected sector number $cs found at $offs\n")
+			if ($cs > 10);
+		if ($cs == $dsec) {
+			$found = $toffs->[0] + 256 + (512 * $ss) + 28;
+			last TWALK;
+		}
+		$offs += 8;
+	}
+	die("could not find track $dsec in TOC at $toffs->[0]\n")
+		if ($found == -1);
+
+	$na7 = unpack("N", substr($disk, $found, 4));
+	if ($na7 < $eos || $na7 > 16777215 || $na7 != $a7) {
+		# probably not present
+		warn "at track TOC $toffs->[0], no valid A7 register found\n";
+	} else {
+		warn "patched stored A7 at offset $found\n";
+		substr($disk, $found, 4) = pack("N", $new_a7);
+		$offs = $found;
+
+		# if there's an A7, there's an idtable
+		if (length($idtable)) {
+			$found = $offs + 228;
+			warn "patched idtable at offset $found\n";
+			substr($disk, $found, 128) = $idtable;
+		}
+	}
+}
+
+# trim image and append payload
+$img = substr($img, 0, 28896);
+
+# add buffer pad space for one row for stack pushes (use unusual character
+# so we can find it in the diff)
+$img .= "k" x ($new_a7 - $eos) if ($new_a7 > $eos);
+
+# use temp token to run anonymous code (see goto word)
+# 0000dbbe 21   wlit 0x00f8	; temp token
+# 0000dbc1 92   +table
+# 0000dbc2 5c   !
+# 0000dbc3 f8   temp
+# 0000dbc4 26   <;>
+# anonymous code must end with next (tForth Documentation, p133) to run right
+# temp's token table entry is at $004107e0
+#  0: false stack word pointing to +4
+# +4: movea.l #OLD_A7,a7
+# +10: movea.l #$004107e0,a1
+# +16: move.l +34,(a1)                  ; same as "target ' temp +table !"
+# +22: move.l #$000000f8,d0
+# +28: jmp $0000d5ea                    ; "temp" (i.e., into execute)
+# target:
+# +34: jmp (a3) << anonymous code word starts here (target + 30)
+$img .= pack("N", $target) .
+	pack("H*", "2e7c") . pack("N", $a7) .
+	pack("H*", "227c004107e0") .
+	pack("H*", "22bc") . pack("N", $target + 30) .
+	pack("H*", "203c000000f8") .
+	pack("H*", "4ef90000d5ea") .
+	pack("H*", "4ed3") ;
+
+# select the forth words we'll use
+if (!length($token)) {
+	# no token, add a simple "press any key"
+	# forth words: " press any key" over + swap do i c@ i 407106 - 17 <demit> loop beep key drop next ;
+	$img .=
+pack("H*", "370df0f2e5f3f3a0e1eef9a0ebe5f9476644234d564d2200407106672017cd24cac24118f026");
+} elsif (!$cold) {
+	# token, intended to return to the editor after execution.
+	# include the entirety of <save> except for the very last <;>
+	$img .=
+	# through doff
+pack("H*", "15fc2018665810d46115fc201c665818546122004072305818686106d10100") .
+	# through getdata
+pack("H*", "0436210088010a11b00152220040770015742100808a2100a0010a13dc61540592") .
+	# through curop-to
+pack("H*", "5406b42101008a06c5027902050209020b020c04920495033614e8121061") .
+	# up to ?diskerror just before <;> (a5 is pointing to <;>)
+pack("H*", "2200407238582b0711fc6407419d482b0511fc64e5") .
+	# forth words: lit (token) execute re ;
+	pack("H*", "21${token}91038f26");
+} else {
+	# token, cold booter. this only needs to use some of <save>
+	# since we don't care about the text and don't use the editor.
+	# however, we still have to unpack and shift the text so that
+	# our Forth vocabulary is in the right place, and we need to
+	# make sure the ROM does not try to repaint the screen.
+	$img .=
+	# through doff
+pack("H*", "15fc2018665810d46115fc201c665818546122004072305818686106d10100") .
+	# showmove? off so that unpacktext doesn't redraw the screen
+pack("H*", "129865") .
+	# through getdata
+pack("H*", "0436210088010a11b00152220040770015742100808a2100a0010a13dc61540592") .
+	# all the way up to the wlit-move just before setupcat
+pack("H*", "5406b42101008a") .
+	# finally: lit (token) execute cold ;
+	pack("H*", "21${token}91033f26");
+}
+	
+# make sure this all fits within the final sector, we have 224 bytes left
+die("resulting image is oversize by ".(length($img)-29120)." bytes\n")
+	if (length($img) > 29120);
+
+# phase 2: patch in image and trailing payload
+# sectors can be in any order in each track, so enumerate the metadata and
+# scramble accordingly
+undef @smap; # table of offsets
+$track = 0;
+
+# first five screen tracks have screen data in all 10 sectors (5120 bytes)
+for($i=$tzero+16384;$i<$tzero+43264;$i+=5376) {
+	# sectors are numbered 0-9
+	$sn = 0;
+	for($j=24;$j<104;$j+=8) {
+		$tn = unpack("C", substr($disk, $i+$j+2, 1));
+		$smap[$track*10+$tn]=$i+256+$sn*512;
+		$sn++;
+	}
+	$track++;
+	die("didn't get enough sectors starting track $track\n")
+		if (scalar(@smap) != $track*10);
+}
+
+# sixth screen track only contains 3296 bytes of screen data, not 5120
+# (28896-25600), so enumerate only seven sectors
+$i = $tzero+43264;
+$sn = 0;
+for($j=24;$j<104;$j+=8) {
+	$tn = unpack("C", substr($disk, $i+$j+2, 1));
+	$smap[$track*10+$tn]=$i+256+$sn*512 if ($tn<7);
+	$sn++;
+}
+die("couldn't locate all screen data sectors\n")
+	if (scalar(@smap) * 512 < 28896);
+
+# now patch the disk image in place sector by sector and emit
+$j = 0;
+$pad = chr(255) x 512;
+foreach(@smap) {
+	# pad the incoming string since the last sector is short but could
+	# be anywhere on that track
+	substr($disk, $_, 512) = substr(substr($img, $j, 512).$pad, 0, 512);
+	$j += 512;
+}
+
+warn "successfully patched, emitting\n";
+print STDOUT $disk;
+
+# check how many leading tracks are unformatted
+sub byt { unpack("C", substr($disk, shift, 1)) }
+$unf = 0; for(;;) { $b = &byt(52+$unf); last if ($b); $unf++; }
+warn "$unf initial tracks are unformatted, optedsk recommended\n" if ($unf);
+
+__DATA__
+
+d7	bp	address of the base of the token table
+d6	iv	address where the value of the current integer is
+d5	sa	address of the start of the definition being executed
+d4	ct	current token (address in token table)
+
+a7	sp	68000 stack pointer (used for Forth parameters)
+a6	rp	return stack pointer
+a5	ip	next token to be executed (instruction pointer)
+a4	nx	execution address of "next" word (on 1.74 always $74d4)
+a3	np	execution address of "nest" word (on 1.74 always $74c6)
+a2	vp	execution address of "integer" word
+
+on entry: token value on stack, a7 is valid, d7 is valid
+execute:
+d5d4:	move.l	(a7)+, d0
+	cmpi.w	#$1000, d0
+	bcs	$d5ea
+-- integers --
+	addi.l	#$40e800, d0
+	move.l	d0, d6
+	movea.l	d6, a0
+	move.l	(a0),-(a7)
+	jmp	(a4)
+-- other words --
+d5ea:	clr.b	d7		this gets overwritten by next
+	movea.l	d7, a0
+	adda.w	d0, a0
+	adda.w	a0, a0
+	adda.w	a0, a0
+	movea.l	(a0), a1
+	jmp 	(a1)		-> first word of code for next token
+				(either assembly or jmp (a3) -> nest)
+
+on entry: a5 is valid, a6 is valid, a1 points to current code location,
+a0 points to current token
+nest:
+74c6:	suba.w	d5, a5
+	move.w	a5, -(a6)	push delta ip
+	move.w	d4, -(a6)	push token
+	lea	($2,a1), a5	ip = a1 + 2 (after jmp(a3))
+	move.l	a1, d5
+	move.l	a0, d4
+next:
+74d4:	move.b	(a5)+, d7	next byte from ip into d7
+	movea.l	d7, a0
+	adda.w	a0, a0
+	adda.w	a0, a0		convert d7 to execution address from table
+	movea.l	(a0), a1
+	jmp	(a1)		-> first word of code for next token
+				(either assembly or jmp (a3) again)
+
+on entry: a6 is valid
+<;>:
+845e:	move.w	(a6)+, d4	pop token
+	movea.w	(a6)+, a0	pop delta
+	movea.l	d4, a1
+	move.l	(a1), d5
+	lea	(a0,d5.l), a5	reconstruct ip
+	jmp	(a4)		-> next
+
+

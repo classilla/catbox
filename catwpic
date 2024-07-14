@@ -1,0 +1,107 @@
+#!/usr/bin/perl
+
+# Usage: ./catwpic input_edsk input_image_pbm
+# The patched disk image is emitted to standard output.
+#
+# input_edsk: Cat eDSK image (check with optedsk to ensure validity)
+# input_image_pbm: 28896-byte inverted 672x344 PBM image for preview tracks
+#
+# Copyright (C)2024 Cameron Kaiser. All rights reserved.
+# BSD license.
+# http://oldvcr.blogspot.com/
+
+eval "use bytes";
+
+($input, $image) = (@ARGV);
+die("usage: $0 input_edsk input_image_pbm\n")
+	if (!length($input) || !length($image));
+undef $/;
+open(K, "$input") || die("can't read $input: $!\n");
+$disk = <K>;
+close(K);
+open(K, "$image") || die("can't read $image: $!\n");
+$img = <K>;
+close(K);
+
+die("$input is not an Extended CPC DSK File\n")
+	if (substr($disk, 0, 21) ne "EXTENDED CPC DSK File");
+
+# find track zero and use as our basis. if this was a previously formatted
+# disk, it's entirely possible there are multiple track zeroes (a bad drive
+# may put it wherever) and it's usually the last of them. we will use this as
+# our anchor since the tracks are laid out in order after that.
+$tzero = 0;
+for($i=256;$i<length($disk);$i+=256) {
+	if (substr($disk, $i, 10) eq 'Track-Info') {
+		$tn = unpack("C", substr($disk, $i + 24, 1));
+		next if ($tn);
+		warn "candidate track zero at offset $i\n";
+		$tzero = $i;
+	}
+}
+die("could not find any track zero\n") if (!$tzero);
+$tzero -= 256;
+
+die("$input does not have the correct geometry to be Cat compatible\n")
+	if (0 ||
+		substr($disk, $tzero + 16384, 10) ne "Track-Info" ||
+		substr($disk, $tzero + 21760, 10) ne "Track-Info" ||
+		substr($disk, $tzero + 27136, 10) ne "Track-Info" ||
+		substr($disk, $tzero + 32512, 10) ne "Track-Info" ||
+		substr($disk, $tzero + 37888, 10) ne "Track-Info" ||
+		substr($disk, $tzero + 43264, 10) ne "Track-Info" ||
+	0);
+
+die("$image is not a 672x344 PBM\n")
+	if (substr($img, 0, 11) ne "P4\n672 344\n");
+$img = substr($img, 11);
+die("$image does not contain 28896/\$70e0 bytes of bitmap data\n")
+	if (length($img) < 28896);
+
+# sectors can be in any order in each track, so enumerate the metadata and
+# scramble accordingly
+undef @smap; # table of offsets
+$track = 0;
+
+# first five screen tracks have screen data in all 10 sectors (5120 bytes)
+for($i=$tzero+16384;$i<$tzero+43264;$i+=5376) {
+	# sectors are numbered 0-9
+	$sn = 0;
+	for($j=24;$j<104;$j+=8) {
+		$tn = unpack("C", substr($disk, $i+$j+2, 1));
+		$smap[$track*10+$tn]=$i+256+$sn*512;
+		$sn++;
+	}
+	$track++;
+	die("didn't get enough sectors starting track $track\n")
+		if (scalar(@smap) != $track*10);
+}
+
+# sixth screen track only contains 3296 bytes of screen data, not 5120
+# (28896-25600), so enumerate only seven sectors
+$i = $tzero+43264;
+$sn = 0;
+for($j=24;$j<104;$j+=8) {
+	$tn = unpack("C", substr($disk, $i+$j+2, 1));
+	$smap[$track*10+$tn]=$i+256+$sn*512 if ($tn<7);
+	$sn++;
+}
+die("couldn't locate all screen data sectors\n")
+	if (scalar(@smap) * 512 < 28896);
+
+# now patch the disk image in place sector by sector and emit
+$j = 0;
+$pad = chr(255) x 512;
+foreach(@smap) {
+	# pad the incoming string since the last sector is short but could
+	# be anywhere on that track
+	substr($disk, $_, 512) = substr(substr($img, $j, 512).$pad, 0, 512);
+	$j += 512;
+}
+print STDOUT $disk;
+
+# check how many leading tracks are unformatted
+sub byt { unpack("C", substr($disk, shift, 1)) }
+$unf = 0; for(;;) { $b = &byt(52+$unf); last if ($b); $unf++; }
+warn "$unf initial tracks are unformatted, optedsk recommended\n" if ($unf);
+

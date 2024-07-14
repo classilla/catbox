@@ -1,0 +1,13 @@
+.DS_Store
+rom
+sendfile
+cfg/
+cfg/*
+nvram/
+nvram/*
+old/
+old/*
+orig/
+orig/*
+work/
+work/*

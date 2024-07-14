@@ -1,0 +1,161 @@
+#!/usr/bin/perl -s
+
+eval "use bytes";
+
+# Optimize a Cat eDSK image by relocating later tracks to track 0 so the
+# Cat can find it more reliably. Can fix eDSK images mastered on Cat drives
+# with bad alignment or track zero sensors. May be able to fix eDSK images
+# mastered on bad drives using previously formatted tracks. Maybe.
+#
+# Usage: ./optedsk [-force] [-test] input_edsk
+# The corrected image (unless -test is given) is emitted to standard output.
+#
+# input_edsk: Cat eDSK image
+#
+# Normal operation: enumerate existing tracks and their positions, then
+# find the idblock track. If unformatted tracks exist before the idblock
+# track, it will automatically relocate later tracks so that the idblock
+# track is physically on track zero. Abort if formatted tracks are found
+# before the idblock track, or if there are multiple possible idtracks, or
+# if there is no valid idtrack.
+#
+# -force: Continue even if no valid idtrack is found or if formatted tracks
+# are found before the idtrack. If there are formatted tracks before the 
+# idblock track, attempt to remove them and relocate later tracks so that
+# the idblock track is physically on track zero as if they were unformatted.
+# THIS IS NOT WELL TESTED AND YOU MAY LOSE DATA. KEEP BACKUPS.
+# You must manually resolve the situation if multiple idtracks are found.
+#
+# -test: Do everything but don't emit the corrected image. Useful for just
+# checking validity. -force -test together is valid.
+#
+# Copyright (C)2024 Cameron Kaiser. All rights reserved.
+# BSD license.
+# http://oldvcr.blogspot.com/
+
+($input) = (@ARGV);
+die("usage: $0 input_edsk")
+	if (!length($input));
+undef $/;
+open(K, "$input") || die("can't read $input: $!\n");
+$disk = <K>;
+close(K);
+
+sub byt { unpack("C", substr($disk, shift, 1)) }
+
+die("$input is not an Extended CPC DSK File\n")
+	if (substr($disk, 0, 21) ne "EXTENDED CPC DSK File" ||
+		substr($disk, 256, 10) ne "Track-Info");
+
+# enumerate all tracks in the eDSK DIB
+$ntracks = &byt(48);
+$nsides = &byt(49);
+warn "DIB contains $ntracks tracks on $nsides sides\n";
+die("Cat disks can only be single sided\n") if ($nsides != 1);
+die("Cat disks can't be larger than 80 tracks\n") if ($ntracks > 80);
+
+# figure out how many leading tracks are unformatted
+$unf = 0;
+LTUF: for(;;) {
+	$b = &byt(52+$unf);
+	last if ($b);
+	$unf++;
+}
+warn "$unf initial tracks are unformatted\n";
+
+# manually search for all tracks (don't trust the DIB)
+$offs = 256;
+while($offs < length($disk)) {
+	push(@tracks, $offs) if (substr($disk, $offs, 10) eq 'Track-Info');
+	$offs += 256;
+}
+$otracks = scalar(@tracks);
+warn "discovered $otracks tracks in the eDSK, TIBs at offset ",
+	join(", ", @tracks), "\n";
+if ($otracks != $ntracks) {
+	warn "track number mismatch, correcting DIB from $ntracks to $otracks\n";
+	substr($disk, 48, 1) = pack("C", $otracks);
+}
+
+@j = @tracks; push(@j, length($disk)); shift @j; $last = 256; @lengths = ();
+foreach(@j) {
+	die("non-Cat tracks detected, aborting\n")
+		if (($_ - $last) != (5120+256));
+	$last = $_;
+}
+
+# find any idblock tracks (if there are multiple possibles, stop and ask)
+$idb = -1;
+TRAK: for ($t=0; $t<scalar(@tracks); $t++) {
+	my $offs = $tracks[$t] + 256;
+
+	# if the first sector is all the same byte, or same pattern of
+	# bytes, or there's no Cat ID, it can't be an idblock, so the entire
+	# track can't have any idblocks in it
+	next TRAK if (0 ||
+		(&byt($offs+102) != 51) || # 33
+		(&byt($offs+103) != 37 && &byt($offs+103) != 38) || #25,26
+		# can't consist of all 0x3325 or 0x3326
+		((substr($disk, $offs, 2) x 256)
+			eq substr($disk, $offs, 512)) ||
+		((substr($disk, $offs, 4) x 128)
+			eq substr($disk, $offs, 512)) ||
+	0);
+
+	# all sectors must match bitwise
+	for ($i=0; $i<512; $i++) {
+		$base = &byt($offs+$i);
+		for ($s=1; $s<10; $s++) {
+			next TRAK if ($base != &byt($offs+$i+512*$s));
+		}
+	}
+	warn "idblock candidate located at track $t offset $offs\n";
+	warn "(warning: this track is not encoded as logical track 0, may relocate)\n"
+		if (&byt($tracks[$t] + 24));
+	die("multiple possible idblock tracks found, halting\n")
+		if ($idb != -1);
+	$idb = $t;
+}
+
+if ($idb == -1) {
+	if ($force) {
+		warn("could not find an idblock track, not a Cat disk?\n");
+	} else {
+		die("could not find an idblock track, not a Cat disk?\n");
+	}
+} elsif ($idb > $unf) {
+	die("formatted tracks exist before idblock, halting\n")
+		unless ($force);
+
+	# THIS IS IFFY! YOU DO THIS AT YOUR OWN RISK!
+	$kill = $idb - $unf;
+	warn("deleting $kill formatted tracks before idblock\n");
+
+	$otracks -= $kill;
+	substr($disk, 48, 1) = pack("C", $otracks);
+	$yankout = $tracks[$kill] - $tracks[0];
+	substr($disk, $tracks[0], $yankout) = '';
+	for(1..$kill) { shift(@tracks); }
+	for($t=0;$t<scalar(@tracks);$t++) { $tracks[$t] -= $yankout; }
+	warn "now $otracks tracks in the eDSK, TIBs at offset ",
+		join(", ", @tracks), "\n";
+}
+
+# rewrite DIB to shift all tracks up
+substr($disk, 52, 80) = (chr(21) x $otracks) . ("\0" x (80 - $otracks));
+
+# correct all physical track numbers
+# if the tracks are in the right order, they will be predictable
+for ($t=0; $t<scalar(@tracks); $t++) {
+	my $offs = $tracks[$t]; #->[0];
+
+	my $w = &byt($offs+24);
+	die("new track $t was $w is out of order logically\n")
+		if ($w != $t);
+	substr($disk, $offs+16, 1) = pack("C", $t);
+}
+warn "$unf unformatted tracks removed successfully\n" if ($unf);
+
+# emit new disk image
+warn "emitting $otracks track eDSK image\n";
+print STDOUT $disk unless ($test);

@@ -1,0 +1,442 @@
+                       THE CANON CAT REMEMBERS JEF RASKIN
+                     From Wikipedia, the free encyclopedia.
+
+This is a document readable on the Canon Cat. To read it, simply scroll through
+it. To scroll, hold down the SHIFT key and press LEAP LEFT to scroll up or LEAP
+RIGHT to scroll down. Each LEAP keypress scrolls one screen line.
+
+You can leap to specific places in this document. To jump to a section, hold
+down LEAP LEFT or LEAP RIGHT, depending on the direction you're going, then
+type that section (like "Contents" or "Personal life") and release the LEAP
+key. You can also search for specific phrases or words this way. To search
+again in the same direction, hold USE FRONT and press the same LEAP key. To
+leap back, press UNDO.
+
+To find a reference, hold LEAP RIGHT, type the reference number, a period, a
+space and a carat (^) symbol. To leap back, press UNDO.
+
+Contents
+
+     * Early life and education
+     * Career history
+          + Apple
+               o Contractor writer
+               o Management
+               o Macintosh
+          + Pioneering the information appliance
+               o Cognetics
+     * Outside interests
+     * Personal life
+     * See also
+     * References
+     * External links
+
+Jef Raskin
+
+   From Wikipedia, the free encyclopedia
+   American computer scientist (1943-2005)
+
+   Jef Raskin (born Jeff Raskin; March 9, 1943 - February 26, 2005) was an
+   American human-computer interface expert who conceived and began
+   leading the Macintosh project at Apple in the late 1970s.
+
+Early life and education
+
+   Jef Raskin was born in New York City to a secular Jewish family,^[1]
+   whose surname is a matronymic from "Raske", Yiddish nickname for
+   Rachel. He received a BA in mathematics and a BS in physics with minors
+   in philosophy and music from Stony Brook University.^[2] In 1967, he
+   received a master's degree in computer science from Pennsylvania State
+   University, after having switched from mathematical logic due to
+   differences of opinion with his advisor. Even though he had completed
+   work typical for a PhD, the university was not accredited for a PhD in
+   computer science.^[2] The first original computer application he wrote
+   was a music application as part of his master's thesis.
+
+   Raskin later enrolled in a graduate music program at the University of
+   California, San Diego (UCSD), but quit to teach art, photography, and
+   computer science there. He worked as an assistant professor in the
+   Visual Arts department from 1968 until 1974. There, he presented shows
+   about toys as works of art.^[3] Raskin announced his resignation from
+   the assistant professorship by flying over the Chancellor's house in a
+   hot air balloon.^[2] He was awarded a National Science Foundation grant
+   to establish a Computer and Humanities center which used several 16-bit
+   Data General Nova computers and CRTs rather than the teletypes which
+   were more common.
+
+   Along with his undergraduate student Jonathan (Jon) Collins, Raskin
+   developed the FLOW programming language for use in teaching programming
+   to the art and humanities students. The language was first used at the
+   Humanities Summer Training Institute held in 1970 at the University of
+   Kansas in Lawrence, Kansas. The language has only seven statements
+   (COMMENT, GET IT, PRINT IT, PRINT "text", JUMP TO, IF IT IS " " JUMP
+   TO, and STOP) and can not manipulate numbers. The language was first
+   implemented in Fortran by Collins in under a week. Later versions of
+   the language utilized "typing amplification" in which only the first
+   letter is typed and the computer provides the balance of the
+   instruction eliminating typing errors. It was also the basis for
+   programming classes taught by Raskin and Collins in the UCSD Visual
+   Arts Department.
+
+   Raskin curated several art shows including one featuring his collection
+   of unusual toys, and presenting toys as works of art.^[3] During this
+   period, he changed the spelling of his name from "Jeff" to "Jef" after
+   having met Jon Collins and liking the lack of extraneous letters.
+
+   Raskin occasionally wrote for computer publications, such as Dr. Dobb's
+   Journal. He formed a company named Bannister and Crun, which was named
+   for two characters playing in the BBC radio comedy The Goon Show.^[4]
+
+Career history
+
+Apple
+
+Contractor writer
+
+   Raskin first met Apple Computer co-founders Steve Jobs and Steve
+   Wozniak in their garage workshop following the debut of their Apple II
+   personal computer at the first West Coast Computer Faire. Jobs hired
+   Raskin's company Bannister and Crun to write the Apple II BASIC
+   Programming Manual. Raskin said "I was talking fifty dollars a page.
+   They talked fifty dollars for the whole manual." Upon the Apple II unit
+   with the serial number of "2", he reportedly wrote "a literate manual
+   that became a standard for the young industry".^[5]^: 108 
+
+Management
+
+   In January 1978, Raskin joined Apple as Manager of Publications, the
+   company's 31st employee. For some time he continued as Director of
+   Publications and New Product Review, and also worked on packaging and
+   other issues. He had concealed his degree in computer science, out of
+   concern for cultural bias against academia among the hobby-driven
+   personal computer industry. He explained, "If they had known ... they
+   might not have let me in the company, because there was such an
+   antiacademic bias in the early Apple days."^[5]^: 108 
+
+   From his responsibility for documentation and testing, Raskin had great
+   influence on early engineering projects. Because the Apple II only
+   displayed uppercase characters on a 40-column screen, his department
+   used the PolyMorphic Systems 8813 (an Intel-8080-based machine running
+   a proprietary operating system called Exec) to write documentation;
+   this spurred the development of an 80-column display card and a
+   suitable text editor for the Apple II. His experiences testing
+   Applesoft BASIC inspired him to design a competing product, called
+   Notzo BASIC, which was never implemented. When Wozniak developed the
+   first disk drives for the Apple II, Raskin went back to his contacts at
+   UCSD and encouraged them to port the UCSD P-System operating system
+   (incorporating a version of the Pascal programming language) to it,
+   which Apple later licensed and shipped as Apple Pascal.
+
+   Through this time, Raskin continually wrote memos about how the
+   personal computer could become a true consumer appliance. While the
+   Apple III was under development in 1978 and '79, Raskin was lobbying
+   for Apple to create a radically different kind of computer that was
+   designed from the start to be easy to use. In Computers by the
+   Millions, he stated that expandable computers like the Apple II were
+   too complex, and development was difficult due to the unknown nature of
+   the machine the program ran on.^[6] The machine he envisioned was very
+   different from the Macintosh that was eventually released and had much
+   more in common with PDAs than modern desktop-based machines.
+
+Macintosh
+
+   Raskin started the Macintosh project in 1979 to implement some of these
+   ideas. He later hired his former student Bill Atkinson from UCSD to
+   Apple, along with Andy Hertzfeld and Burrell Smith from the Apple
+   Service Department, which was located in the same building as the
+   Publications Department. Secretly bypassing Jobs's ego and authority by
+   continually securing permission and funding directly at the executive
+   level, Raskin created and solely supervised the Macintosh project for
+   approximately its first year. This included selecting the name of his
+   favorite apple, writing the mission document The Book of Macintosh,
+   securing office space, and recruiting and managing the original
+   staff.^[5]^: 111  Author Steven Levy said, "It was Raskin who provided
+   the powerful vision of a computer whose legacy would be low cost, high
+   utility, and a groundbreaking friendliness."^[5]^: 122 
+
+   The prototype was similar in power to the Apple II and included a small
+   9-inch (230 mm) black-and-white character display and floppy drive, in
+   a small case. It was text only, as Raskin disliked the computer mouse
+   or anything else that could take his hands from the
+   keyboard.^[5]^: 111  Several basic applications were built into the
+   machine, selectable by pressing function keys. The machine included
+   logic to understand user intentions and switch programs dynamically.
+   For instance, if the user simply started typing text it switched into
+   editor mode, and if numbers are typed it switched to calculator mode.
+   In many cases these switches were largely invisible to the user.
+
+     It was clear that Macintosh was the most interesting thing at
+     Apple-and Steve Jobs took it over.
+
+   Jef Raskin^[5]^: 111 
+
+   In 1981, after the Lisa team had "kicked him out", Steve Jobs's
+   attention drew toward Raskin's Macintosh project, intending to combine
+   the Xerox PARC-inspired GUI-based Lisa design to Raskin's
+   appliance-computing, "computers-by-the-millions" concept. Steve
+   Wozniak, who around then had been co-leading the Macintosh team with
+   Raskin, was on hiatus from the company following a traumatic airplane
+   accident, allowing Jobs to take managerial lead over the project.^[7]
+
+   Raskin is credited as one of the first to introduce Jobs and the Lisa
+   engineers to the PARC concepts, though he ultimately dismissed PARC's
+   technology and opposed the use of the mouse.^[5]^: 110  Raskin claimed
+   to have had continued direct input into the eventual Mac design,
+   including the decision to use a one-button mouse as part of the Apple
+   interface, instead of PARC's 3-button mouse.^[citation needed] Others,
+   including Larry Tesler, acknowledge his advocacy for a one-button mouse
+   but say that it was a decision reached simultaneously by others at
+   Apple who had stronger authority on the issue.^[citation needed] Raskin
+   later stated that were he to redesign the mouse, it would have three
+   clearly labeled buttons-two buttons on top marked "Select" and
+   "Activate", and a "Grab" button on the side that could be used by
+   squeezing the mouse.^[8] It has the three described buttons (two
+   invisible), but they are assigned to different functions than Raskin
+   specified for his own interface and can be customized.
+
+   In 2005,^[9] Macintosh project member Andy Hertzfeld remembered
+   Raskin's reputation for often inaccurately claiming to have invented
+   various technologies. Raskin's resume from 2002 lends credence by
+   stating he was "Creator of Macintosh computer at Apple Computer,
+   Inc."^[10] Raskin conceived and solely supervised the Macintosh project
+   for approximately its first year;^[5]^: 111  however, Hertzfeld
+   describes Raskin's relationship to the drastically different finished
+   Mac product more like that of an "eccentric great uncle" than its
+   father.^[11]^[12] In Jobs's "Lost Interview" from 1996, he refers to
+   the Macintosh as a product of team effort while acknowledging Raskin's
+   early role.^[13]^[failed verification] Jobs reportedly co-opted some of
+   Raskin's leadership philosophies, such as when he wrote the slogan on
+   the Macintosh group's easel, "It's better to be a pirate than to join
+   the Navy."^[14]^: 271 
+
+   Apple acknowledged Raskin's role after he had left the company by
+   gifting him the millionth Macintosh computer, with an engraved brass
+   plaque on the front.^[15]
+
+Pioneering the information appliance
+
+   Raskin left Apple in 1982^[16] and formed Information Appliance, Inc.
+   to implement the concepts of his original Macintosh concept. The first
+   product is the SwyftCard, a firmware card for the Apple II series
+   containing an integrated application suite, also released on a disk as
+   SwyftWare. Information Appliance later developed the Swyft as a
+   stand-alone laptop computer. Raskin licensed this design to Canon,
+   which shipped a similar desktop product as the Canon Cat. Released in
+   1987, the unit had an innovative interface that attracted much interest
+   but it did not become a commercial success. Raskin claimed that its
+   failure was due in some part to Steve Jobs, who successfully pitched
+   Canon on the NeXT Computer at about the same time. It has also been
+   suggested that Canon canceled the Cat due to internal rivalries within
+   its divisions. After running a cryptic full page advertisement in the
+   Wall Street Journal that the "Canon Cat is coming" months before it was
+   available, Canon failed to follow through, never airing the completed
+   TV advertisement at launch, only allowed the Cat to be sold by its
+   typewriter sales people, and prevented Raskin from selling the Cat
+   directly with a TV demonstration of how easy it was to use. Shortly
+   thereafter, the stock market crash of 1987 so panicked Information
+   Appliance's venture capitalists that they drained millions of dollars
+   from the company, depriving it of the capital needed to be able to
+   manufacture and sell the Swyft.^[citation needed]
+
+   Raskin wrote a book, The Humane Interface (2000),^[17] in which he
+   developed his ideas about human-computer interfaces.
+
+   Raskin was a long-time member of BAYCHI, the Bay-Area Computer-Human
+   Interface group, a professional organization for human-interface
+   designers. He presented papers on his own work, reviewed the human
+   interfaces of various consumer products (such as a BMW car he'd been
+   asked to review), and discussed the work of his colleagues in various
+   companies and universities.
+
+   At the start of the new millennium, Raskin undertook the building of a
+   new computer interface based on his 30 years of work and research,
+   called The Humane Environment, THE. On January 1, 2005, he renamed it
+   Archy. It is a system incarnating his concepts of the humane interface,
+   by using open source elements within his rendition of a ZUI or Zooming
+   User Interface. In the same period, Raskin accepted an appointment as
+   Adjunct Professor of Computer Science at the University of Chicago's
+   Computer Science Department and, with Leo Irakliotis, started designing
+   a new curriculum on humane interfaces and computer enterprises.
+
+   His work is being extended and carried on by his son Aza Raskin at
+   Humanized, a company that was started shortly after Raskin's death to
+   continue his legacy. Humanized released Enso, a linguistic command-line
+   interface, which is based on Jef's work and dedicated in his memory. In
+   early 2008, Humanized became part of Mozilla.^[18]
+
+   The Archy project never included a functional ZUI, but a third party
+   developed a commercial application called Raskin inspired by the same
+   Zoomworld ZUI idea.^[19]^[20]^[21]
+
+Cognetics
+
+   Raskin expanded the meaning of the term "cognetics" in his book The
+   Humane Interface to mean "the ergonomics of the mind". According to
+   Raskin Center, "Cognetics brings interface design out of the mystic
+   realm of guruism, transforming it into an engineering discipline with a
+   rigorous theoretical framework."
+
+   The term cognetics had earlier been coined and trademarked by Charles
+   Kreitzberg in 1982 when he started Cognetics Corporation, one of the
+   first user experience design companies.^[22] It is also used to
+   describe educational programs intended to foster thinking skills in
+   grades 3-12 (US)^[23] and for Cognetics, Inc., an economic research
+   firm founded by David L. Birch, a Professor at MIT.^[24]
+
+   Raskin discouraged using the informal term "intuitive" in user
+   interface design, claiming that easy to use interfaces are often due to
+   exposure to previous, similar systems, thus the term "familiar" should
+   be preferred.^[25] Aiming for "intuitive" interfaces (based on reusing
+   existing skills with interaction systems) could lead designers to
+   discard a better design solution only because it would require a novel
+   approach.
+
+Outside interests
+
+   Best known as a computer scientist, Raskin had other interests. He
+   conducted the San Francisco Chamber Opera Society and played various
+   instruments, including the organ and the recorder. His artwork was
+   displayed at New York's Museum of Modern Art as part of its permanent
+   collection, the Los Angeles County Museum of Art, and the University of
+   California, San Diego. He received a patent for airplane wing
+   construction,^[26] and designed and marketed radio controlled model
+   gliders.
+
+   He was said to be an accomplished archer, target shooter, bicycle racer
+   and an occasional model race car driver.^[citation needed] He was a
+   passionate musician and composer, publishing a series of collected
+   recorder studies using the pseudonym of Aabel Aabius.^[citation needed]
+   In his later years he also wrote freelance articles for Macintosh
+   magazines, such as Mac Home Journal, and many modeling magazines,
+   Forbes, Wired, and computing journals.^[citation needed] One of his
+   most favorite pastimes was to play music with his children. He
+   accompanied them on the piano while they played or sang while going
+   through old fake-books passed down from his father. They routinely
+   improvised together.^[citation needed]
+
+   Raskin owned Jef's Friends, a small company which made model airplane
+   kits, which were sold through hobby shops.^[27]^[3]
+
+   He was a toy designer. He designed Space Expander, a hanging cloth maze
+   for a person to walk through. He designed Bloxes, a set of interlocking
+   wood blocks.^[3]
+
+   One of Raskin's instruments was the organ. In 1978 he published an
+   article in BYTE on using computers with the instrument.^[28]
+
+   Raskin published a paper highly critical of pseudoscience in nursing,
+   such as therapeutic touch and Rogerian science, wherein he said:
+   "Unlike science, nursing theory has no built-in mechanisms for
+   rejecting falsehoods, tautologies, and irrelevancies."^[29]^[30]
+
+Personal life
+
+   Jef Raskin married Linda S. Blum in 1982. They had three children
+   together-Aza, Aviva, and Aenea, with honorary surrogate siblings R.
+   Fureigh and Jenna Mandis. In 1985, Raskin described his house as
+   "practically one large playground", with secret doors and passageways,
+   an auditorium that seats 185, and a model airplane room. He said, "I
+   decided when I grew up I was not going to give up the things I liked
+   doing, and I've not."^[3]
+
+   He was diagnosed with pancreatic cancer in December 2004 and died in
+   Pacifica, California, on February 26, 2005, at age 61.^[31]
+
+See also
+
+     * Information appliance
+
+References
+
+    1. ^ Jef Raskin, "Meeting Merlin"
+    2. ^ ^a ^b ^c "A conversation with Jef Raskin". Ubiquity. July 2003.
+    3. ^ ^a ^b ^c ^d ^e Pollack, Andrew (December 25, 1985). "In High-Tech
+       Silicon Valley, Entrepreneurs Turn to Toys". New York Times.
+       Retrieved February 16, 2021.
+    4. ^ "The Father Of The Macintosh". Folklore.org. Archived from the
+       original on November 1, 2007.
+    5. ^ ^a ^b ^c ^d ^e ^f ^g ^h Levy, Steven (2000) [1994]. Insanely
+       Great: The Life and Times of Macintosh, the Computer That Changed
+       Everything. New York City: Penguin Books. ISBN 0140291776.
+       OCLC 474924791.
+    6. ^ Jef Raskin, Jef Raskin, "Computers by the Millions", 1979
+    7. ^ "Steve Wozniak on Newton, Tesla, and why the original Macintosh
+       was a 'lousy' product". June 27, 2013. Archived from the original
+       on March 12, 2016. Retrieved June 23, 2018.
+    8. ^ The Humane Interface Appendix A, Pg. 209, last paragraph
+    9. ^ "Steve Jobs - The Lost Interview". Retrieved November 20, 2012.
+   10. ^ "Jef Raskin - Curriculum Vitae". January 8, 2002. Archived from
+       the original on October 3, 2003. Retrieved November 20, 2012.
+   11. ^ "The Father Of The Macintosh". Folklore.org.
+   12. ^ "Steve Jobs, Jef Raskin, and The Humane Interface".
+   13. ^ Leith, Sam (October 25, 2011). "Steve Jobs: The Exclusive
+       Biography by Walter Isaacson - review". the Guardian. Retrieved
+       July 7, 2016.
+   14. ^ Malone, Michael S. (1999). Infinite Loop. New York:
+       Currency/Doubleday. ISBN 978-0-385-48684-2. OCLC 971131326.
+   15. ^ Kahney, Leander. "More Antique Apples on the Block". Wired.
+   16. ^ Elliott, Andrea (February 28, 2005). "Jef Raskin, 61, Developer
+       of Apple Macintosh, Is Dead". The New York Times.
+   17. ^ Raskin, Jef 2000.The Humane Interface, Addison-Wesley
+       ISBN 0-201-37937-6
+   18. ^ "Humanized Joining Mozilla". Humanized Inc. January 16, 2008.
+       Archived from the original on January 20, 2008. Retrieved August
+       25, 2008.
+   19. ^ "Raskin, A Finder Replacement for Mac". macstories.net. June 4,
+       2010.
+   20. ^ "Raskin - Beyond Desktop - Raskin Beta". Raskin Apps / Media,
+       Raskin Software LLC.
+   21. ^ Raskin fuer Mac: Dateien und Ordner aus der Vogelperspektive (in
+       German)
+   22. ^ Anderson, Clifford (October 2007). "Thumbnail: Charlie
+       Kreitzberg". UPA Voice. Archived from the original on February 22,
+       2012. Retrieved June 24, 2014.
+   23. ^ Burr, J. et al., Cognetics: Thinking Skills Activities in
+       Inventions/Technology and Science. Teacher's Manual and Student
+       Manual. Philadelphia, PA: RBS Publications, 1992.
+   24. ^ "The Little Engine That Could". The New York Times. May 1, 1988.
+       Retrieved May 6, 2010.
+   25. ^ Intuitive equals familiar, Communications of the ACM. 37:9,
+       September 1994, pg. 17.
+   26. ^ "Jef Raskin - Curriculum Vitae". Archived from the original on
+       July 20, 2007. Retrieved April 9, 2012.
+   27. ^ Raskin, Jef (2002). "The AMA History Project Presents:
+       Autobiography of Jef Raskin" (PDF). Academy of Model Aeronautics.
+       Archived (PDF) from the original on December 3, 2019. Retrieved
+       December 3, 2019.
+   28. ^ Raskin, Jef (March 1978). "The Microcomputer and the Pipe Organ".
+       BYTE. p. 56. Retrieved October 17, 2013.
+   29. ^ "Rogerian nursing theory: A humbug in the halls of higher
+       learning". Skeptical Inquirer. 24 (5): 30-35. 2000.
+   30. ^ Raskin, Jef. "Humbug: Nursing Theory". Archived from the original
+       on July 10, 2001. Retrieved December 14, 2015.
+   31. ^ Elliott, Andrea (February 28, 2005). "Jef Raskin, 61, Developer
+       of Apple Macintosh, Is Dead". The New York Times.
+
+   Categories:
+     * Jef Raskin
+     * 1943 births
+     * 2005 deaths
+     * American computer scientists
+     * 20th-century American Jews
+     * Apple Inc. employees
+     * Canon (company) people
+     * Deaths from pancreatic cancer in California
+     * Human-computer interaction researchers
+     * Pennsylvania State University alumni
+     * People from Pacifica, California
+     * Stony Brook University alumni
+     * Writers from California
+     * 21st-century American Jews
+
+     * This page was last edited on 3 May 2024, at 18:53 (UTC).
+     * Text is available under the Creative Commons Attribution-ShareAlike
+       License 4.0; additional terms may apply. By using this site, you
+       agree to the Terms of Use and Privacy Policy. Wikipedia(R) is a
+       registered trademark of the Wikimedia Foundation, Inc., a
+       non-profit organization.
+     * Formatting, Raskin photograph conversion and custom boot loader for
+       the Canon Cat written by Cameron Kaiser. This presentation is neither
+       endorsed nor supported by the Wikimedia Foundation, Inc.
+     * You may freely copy this disk.
+

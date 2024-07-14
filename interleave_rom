@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+eval "use bytes";
+
+# interleaves Cat ROMs so you can disassemble them
+# Copyright (C)2024 Cameron Kaiser. All rights reserved.
+# BSD license.
+# http://oldvcr.blogspot.com/
+#
+# do something like
+#	./interleave_rom r74*.ic[24] > rom
+#	./interleave_rom r74*.ic[35] >> rom
+
+($f1, $f2) = (@ARGV);
+die("usage: $0 file1 file2\n") if (!length($f1) || !length($f2));
+open(F1, "$f1") || die("can't open $f1: $!\n");
+open(F2, "$f2") || die("can't open $f2: $!\n");
+select(STDOUT); $|++;
+
+for(;;) {
+	if (eof(F1) || eof(F2)) {
+		die("files did not end at the same point\n")
+			if (!(eof(F1) && eof(F2)));
+		exit 0;
+	}
+
+	read(F1, $x, 1); print STDOUT $x;
+	read(F2, $x, 1); print STDOUT $x;
+}
+
+die("unreachable\n");
+
